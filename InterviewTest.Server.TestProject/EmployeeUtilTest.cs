@@ -1,4 +1,5 @@
-﻿using InterviewTest.Server.Util;
+﻿using InterviewTest.Server.Model;
+using InterviewTest.Server.Util;
 
 namespace InterviewTest.Server.TestProject
 {
@@ -115,6 +116,16 @@ namespace InterviewTest.Server.TestProject
                 if (e.Name.StartsWith("A") || e.Name.StartsWith("B") || e.Name.StartsWith("C")) return e.Value; else return 0;
             }).Sum();
             Assert.IsTrue(abcSum > 0); // 4678 on first run. < 11171
+        }
+
+        [TestMethod]
+        public void Given_New_Employee_Then_Add_Successfully()
+        {
+            var emp = new Employee(0, "Hello", 999);
+            Assert.IsTrue(EmployeeUtil.AddEmployee(emp));
+                var allEmployees = EmployeeUtil.GetAllEmployees();
+            Assert.IsNotNull(allEmployees);
+            Assert.IsTrue(allEmployees.Any(e => e.Name == emp.Name && e.Value == emp.Value));
         }
     }
 }

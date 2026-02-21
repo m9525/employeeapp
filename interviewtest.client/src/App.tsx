@@ -28,7 +28,13 @@ function App() {
     }
 
     const onAdd = async () => { // TODO
-        await fetch(`/api/employees/add`, { method: 'POST' })
+        await fetch(`/api/employees/add`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({                
+                    Id: 0,
+                    Name: 'Hello',
+                    Value: 900                
+            }) })
         fetchEmployees()
     }
 
