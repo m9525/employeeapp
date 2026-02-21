@@ -1,2 +1,4 @@
 ﻿/.vs
 /.vscode
+/InterviewTest.Server.TestProject/bin/Debug/net10.0
+/InterviewTest.Server.TestProject/obj

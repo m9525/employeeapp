@@ -1,6 +1,7 @@
 ﻿using InterviewTest.Server.Model;
+using InterviewTest.Server.Util;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
+using static InterviewTest.Server.Util.EmployeeUtil;
 
 namespace InterviewTest.Server.Controllers
 {
@@ -11,29 +12,37 @@ namespace InterviewTest.Server.Controllers
         [HttpGet]
         public List<Employee> Get()
         {
-            var employees = new List<Employee>();
+            return GetAllEmployees();
+        }
 
-            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
-            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-            {
-                connection.Open();
+        [HttpGet("{id}")]
+        public Employee Get(int id)
+        {
+            return GetEmployee(id);
+        }
 
-                var queryCmd = connection.CreateCommand();
-                queryCmd.CommandText = @"SELECT Name, Value FROM Employees";
-                using (var reader = queryCmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        employees.Add(new Employee
-                        {
-                            Name = reader.GetString(0),
-                            Value = reader.GetInt32(1)
-                        });
-                    }
-                }
-            }
+        [HttpPost("add")]
+        public bool Add(Employee employee) // TODO: string name, int value
+        {
+            return AddEmployee(employee);
+        }
 
-            return employees;
+        [HttpPut("update")] // TODO: int id, string name, int value
+        public bool Update(Employee employee)
+        {
+            return UpdateEmployee(employee);
+        }
+
+        [HttpDelete("{id}")]
+        public bool Delete(int id)
+        {
+            return DeleteEmployee(id);
+        }
+
+        [HttpGet("increase")]
+        public void Increase()
+        {
+            BulkValueIncrement();
         }
     }
 }

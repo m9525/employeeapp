@@ -1,7 +1,12 @@
 using Microsoft.Data.Sqlite;
 
 #region Prepare Sqlite
-var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+// var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+var connectionStringBuilder = new SqliteConnectionStringBuilder()
+{
+    DataSource = "C://repos/employeeapp/InterviewTest.Server/SqliteDB.db"
+};
+
 using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
 {
     connection.Open();
@@ -11,14 +16,14 @@ using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionS
     delTableCmd.ExecuteNonQuery();
 
     var createTableCmd = connection.CreateCommand();
-    createTableCmd.CommandText = "CREATE TABLE Employees(Name VARCHAR(50), Value INT)";
-    createTableCmd.ExecuteNonQuery();
+    createTableCmd.CommandText = "CREATE TABLE Employees(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(50), Value INT)";
+    createTableCmd.ExecuteNonQuery();    
 
     //Fill with data
     using (var transaction = connection.BeginTransaction())
     {
         var insertCmd = connection.CreateCommand();
-        insertCmd.CommandText = @"INSERT INTO Employees VALUES
+        insertCmd.CommandText = @"INSERT INTO Employees(Name, Value) VALUES
                         ('Abul', 1357),
                         ('Adolfo', 1224),
                         ('Alexander', 2296),
@@ -93,7 +98,7 @@ using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionS
                         ('Yury', 1854)";
         insertCmd.ExecuteNonQuery();
         transaction.Commit();
-    }
+    }   
 }
 #endregion
 
