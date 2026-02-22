@@ -7,10 +7,9 @@ namespace InterviewTest.Server.Util
     /// Database, extension, etc for Employee related operations
     /// </summary>
     public static class EmployeeUtil
-    {
-        //C:\repos\employeeapp\InterviewTest.Server\SqliteDB.db
-        // private static readonly string EmployeeConnectionString = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" }.ConnectionString;
-        private static readonly string EmployeeConnectionString = new SqliteConnectionStringBuilder() { DataSource = "C://repos/employeeapp/InterviewTest.Server/SqliteDB.db" }.ConnectionString;
+    {        
+        private static readonly string EmployeeConnectionString = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" }.ConnectionString;
+        // private static readonly string EmployeeConnectionString = new SqliteConnectionStringBuilder() { DataSource = "C://repos/employeeapp/InterviewTest.Server/SqliteDB.db" }.ConnectionString;
 
         public static List<Employee> GetAllEmployees()
         {
@@ -80,7 +79,7 @@ namespace InterviewTest.Server.Util
             using (var connection = new SqliteConnection(EmployeeConnectionString))
             {
                 connection.Open();
-                var insertCmd = connection.CreateCommand();
+                var insertCmd = connection.CreateCommand(); // can do transaction here
                 // without ID, since it's auto-incremented in the DB, we can just insert Name and Value
                 insertCmd.CommandText = @"INSERT INTO Employees(Name, Value) VALUES (@name, @value)";
                 insertCmd.Parameters.AddWithValue("@name", employee.Name);
@@ -109,7 +108,7 @@ namespace InterviewTest.Server.Util
             using (var connection = new SqliteConnection(EmployeeConnectionString))
             {
                 connection.Open();
-                var deleteCmd = connection.CreateCommand();
+                var deleteCmd = connection.CreateCommand(); // can do transaction here
                 deleteCmd.CommandText = @"DELETE FROM Employees WHERE Id = @id";
                 deleteCmd.Parameters.AddWithValue("@id", id);
                 return deleteCmd.ExecuteNonQuery() > 0;

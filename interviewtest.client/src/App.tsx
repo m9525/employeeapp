@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { Employee } from './Employee';
 
 function App() {
-    const [employees, setEmployees] = useState<Employee[]>([]);         
+    const [employees, setEmployees] = useState<Employee[]>([]);             
+    const [newName, setNewName] = useState('');         
+    const [newValue, setNewValue] = useState(-1);         
+    const [editedName, setEditedName] = useState('');
+    const [editedValue, setEditedValue] = useState(-1);   
+
     const maxABCLimit: number = 11171;
 
     useEffect(() => {
@@ -11,7 +16,7 @@ function App() {
 
     async function fetchEmployees() {
         const response = await fetch('api/employees');
-        const data = await response.json();                
+        const data = await response.json();            
         setEmployees(data);
     }
 
@@ -24,40 +29,31 @@ function App() {
     const onIncrease = async () => {        
         await fetch(`/api/employees/increase`, { method: 'GET' })
         fetchEmployees()
-    }
+    }   
 
-    const onAdd = async () => { // TODO
+    const onAdd = async () => {
+        if (newName == "" || newName == "\n" || newValue < 0) return;
+
         await fetch(`/api/employees/add`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({                
-                    Id: 0,
-                    Name: 'Hello',
-                    Value: 900                
+                Id: 0,
+                Name: newName,
+                Value: newValue                
             }) })
         fetchEmployees()
+        //reset
+        setNewName(''); setNewValue(-1);
     }
 
-    const onEdit = async (id: number) => {     
-        let newName: string = "";
-        let newValue: number = 0;
-
-        const elNameNew = document.getElementById('tdEdit' + id + "-name-new");
-        if (elNameNew) {
-            newName = elNameNew.innerText;
-        }               
-
-        const elValueNew = document.getElementById('tdEdit' + id + "-value-new");
-        if (elValueNew && !Number.isNaN(elValueNew.innerText)) {
-            newValue = Number(elValueNew.innerText);
-        }               
-
-        if (newName != "" && newName != "\n" && newValue > 0) {
+    const onEdit = async (id: number) => {             
+        if (editedName != "" && editedName != "\n" && editedValue > -1) {
             await fetch(`/api/employees/update`, {
                 method: 'PUT', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     Id: id,
-                    Name: newName,
-                    Value: newValue
+                    Name: editedName,
+                    Value: editedValue
                 })
             })
         }
@@ -65,7 +61,7 @@ function App() {
         fetchEmployees()
     }  
 
-    const onEditClicked = async (id: number) => { // show hide buttons
+    const onEditClicked = async (id: number) => { 
         if (!confirm('Edit id ' + id + '?')) return;
 
         const element = document.getElementById('tdEdit' + id);
@@ -73,22 +69,14 @@ function App() {
             element.style.display = 'block';
             const elName = document.getElementById('tdEdit' + id + "-name");
             if (elName) {
-                const elNameNew = document.getElementById('tdEdit' + id + "-name-new");
-                if (elNameNew) {
-                    elNameNew.innerText = elName.innerText;
-                    elNameNew.contentEditable = "true";
-                    elNameNew.style.backgroundColor = "lightblue";
-                }               
+                const oldName: string = elName.innerText;
+                setEditedName(oldName);
             }
             
             const elValue = document.getElementById('tdEdit' + id + "-value");
-            if (elValue) {                
-                const elValueNew = document.getElementById('tdEdit' + id + "-value-new");
-                if (elValueNew) {
-                    elValueNew.innerText = elValue.innerText;
-                    elValueNew.contentEditable = "true";
-                    elValueNew.style.backgroundColor = "lightblue";
-                }                
+            if (elValue) {
+                const oldValue: number = Number(elValue.innerText);
+                setEditedValue(oldValue);
             }
         }
 
@@ -104,8 +92,9 @@ function App() {
     
     const sumABC = employees.filter((e) => e.name.startsWith("A") || e.name.startsWith("B") || e.name.startsWith("C")).reduce((prev, curr) => prev + curr.value, 0);
 
+    // TODO: Connectivity check line won't work if employees count is 0, ie a brand new company maybe?
     return (<>
-        <div>Connectivity check: {employees.length > 0 ? `OK (${employees.length})` : `NOT READY`}</div>
+        <div>Connectivity check: {employees.length > 0 ? `OK (${employees.length})` : `NOT READY`}</div> 
         <div>
             <table>
                 <thead><tr><th>Actions</th><th>Name</th><th>Value</th></tr></thead>
@@ -119,8 +108,8 @@ function App() {
                         <td id={`tdEdit${e.id}-name`}>{e.name}</td>
                         <td id={`tdEdit${e.id}-value`}>{e.value}</td>
                         <td style={{ display: "none" }} id={`tdEdit${e.id}`}>
-                            <td id={`tdEdit${e.id}-name-new`}></td>
-                            <td id={`tdEdit${e.id}-value-new`}></td>
+                            <input id={`tdEdit${e.id}-name-new`} width={`100px`} title="Edited name, click to edit" value={editedName} onChange={(e) => setEditedName(e.target.value)} />
+                            <input id={`tdEdit${e.id}-value-new`} width={`50px`} title="Edited value, click to edit" value={editedValue} onChange={(e) => setEditedValue(Number(e.target.value))} />
                             <button onClick={() => onEdit(e.id)}>Save Edit</button>
                             <button onClick={() => onCancel(e.id)}>Cancel Edit</button>
                         </td>
@@ -129,16 +118,21 @@ function App() {
                 </tbody>
             </table>
         </div>
-        <div><button onClick={() => onAdd()}>Add Me! TODO</button>
         <div>
-                <div>Name: </div><div id="newName">NewName</div><div id="newValue">0</div>
+            <div>Fill fields below for new employee</div>            
+            <div>
+                <div><div>Name: </div><input id="newName" title="New name" type="text" value={newName} onChange={(e) => setNewName(e.target.value)} /></div>
+                <div><div>Value: </div><input id="newValue" title="New value" type="number" value={newValue} onChange={(e) => setNewValue(Number(e.target.value))} /></div>
             </div>
+            then <button onClick={() => onAdd()}>Add Me!</button>
         </div>
+
         <div>
+        <div>Increase name starts with E by 1, G by 10, any other by 100</div>
             <button onClick={() => onIncrease()}>Increase Me!</button>
             {
                 sumABC <= maxABCLimit ? `` : `A B C bigger than eq ${maxABCLimit}: ${sumABC}`
-            }                
+            }
         </div>
     </>);
 

@@ -22,12 +22,12 @@ namespace InterviewTest.Server.Controllers
         }
 
         [HttpPost("add")]
-        public bool Add(Employee employee) // TODO: string name, int value
+        public bool Add(Employee employee)
         {
             return AddEmployee(employee);
         }
 
-        [HttpPut("update")] // TODO: int id, string name, int value
+        [HttpPut("update")] 
         public bool Update(Employee employee)
         {
             return UpdateEmployee(employee);
