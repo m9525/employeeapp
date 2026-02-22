@@ -1,11 +1,8 @@
 using Microsoft.Data.Sqlite;
 
 #region Prepare Sqlite
-// var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
-var connectionStringBuilder = new SqliteConnectionStringBuilder()
-{
-    DataSource = "C://repos/employeeapp/InterviewTest.Server/SqliteDB.db"
-};
+var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+// var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "C://repos/employeeapp/InterviewTest.Server/SqliteDB.db" };
 
 using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
 {
@@ -16,7 +13,7 @@ using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionS
     delTableCmd.ExecuteNonQuery();
 
     var createTableCmd = connection.CreateCommand();
-    createTableCmd.CommandText = "CREATE TABLE Employees(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(50), Value INT)";
+    createTableCmd.CommandText = "CREATE TABLE Employees(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name VARCHAR(50) NOT NULL, Value INT NOT NULL)";
     createTableCmd.ExecuteNonQuery();    
 
     //Fill with data

@@ -21,34 +21,51 @@ function App() {
     }
 
     const onDelete = async (id: number) => {
-        if (!confirm('Delete id ' + id + '?')) return
-        await fetch(`/api/employees/${id}`, { method: 'DELETE' })
-        fetchEmployees()
+        if (!confirm('Delete id ' + id + '?')) return;
+        const response = await fetch(`/api/employees/${id}`, { method: 'DELETE' })
+        if (response.ok) {
+            fetchEmployees()
+        } else {
+            alert('Delete failed')
+        }
     }
 
     const onIncrease = async () => {        
-        await fetch(`/api/employees/increase`, { method: 'GET' })
-        fetchEmployees()
+        const response = await fetch(`/api/employees/increase`, { method: 'GET' })
+        if (response.ok) {
+            fetchEmployees()
+        } else {
+            alert('Increase failed')
+        }
     }   
 
     const onAdd = async () => {
-        if (newName == "" || newName == "\n" || newValue < 0) return;
+        if (newName == "" || newName == "\n" || newValue < 0) {
+            alert("Name must not be empty, value must be defined"); 
+            return;
+        }
 
-        await fetch(`/api/employees/add`, {
+        const response = await fetch(`/api/employees/add`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({                
                 Id: 0,
                 Name: newName,
                 Value: newValue                
-            }) })
-        fetchEmployees()
-        //reset
-        setNewName(''); setNewValue(-1);
+            })
+        })
+        if (response.ok) {
+            fetchEmployees()
+            //reset
+            setNewName(''); setNewValue(-1);
+        } else {
+            alert('Add failed')
+        }
     }
 
     const onEdit = async (id: number) => {             
         if (editedName != "" && editedName != "\n" && editedValue > -1) {
-            await fetch(`/api/employees/update`, {
+            // not handling effort of checking new value equals old value, can do by introducing another state variable for old value, but skipping for now
+            const response = await fetch(`/api/employees/update`, {
                 method: 'PUT', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     Id: id,
@@ -56,9 +73,18 @@ function App() {
                     Value: editedValue
                 })
             })
+
+            if (response.ok) {
+                await onCancel(id);
+                fetchEmployees()
+            }
+            else {
+                alert('Edit failed')
+            }
         }
-        await onCancel(id);
-        fetchEmployees()
+        else {
+            alert("Name must not be empty, value must be defined"); 
+        }
     }  
 
     const onEditClicked = async (id: number) => { 
@@ -108,8 +134,8 @@ function App() {
                         <td id={`tdEdit${e.id}-name`}>{e.name}</td>
                         <td id={`tdEdit${e.id}-value`}>{e.value}</td>
                         <td style={{ display: "none" }} id={`tdEdit${e.id}`}>
-                            <input id={`tdEdit${e.id}-name-new`} width={`100px`} title="Edited name, click to edit" value={editedName} onChange={(e) => setEditedName(e.target.value)} />
-                            <input id={`tdEdit${e.id}-value-new`} width={`50px`} title="Edited value, click to edit" value={editedValue} onChange={(e) => setEditedValue(Number(e.target.value))} />
+                            <input id={`tdEdit${e.id}-name-new`} width={`100px`} type="text" title="Edited name, click to edit" value={editedName} onChange={(e) => setEditedName(e.target.value)} />
+                            <input id={`tdEdit${e.id}-value-new`} width={`50px`} type="number" title="Edited value, click to edit" value={editedValue} onChange={(e) => setEditedValue(Number(e.target.value))} />
                             <button onClick={() => onEdit(e.id)}>Save Edit</button>
                             <button onClick={() => onCancel(e.id)}>Cancel Edit</button>
                         </td>
