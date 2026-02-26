@@ -1,7 +1,6 @@
-﻿using InterviewTest.Server.Model;
-using InterviewTest.Server.Util;
+﻿using InterviewTest.Interfaces;
+using InterviewTest.Server.Model;
 using Microsoft.AspNetCore.Mvc;
-using static InterviewTest.Server.Util.EmployeeUtil;
 
 namespace InterviewTest.Server.Controllers
 {
@@ -9,40 +8,47 @@ namespace InterviewTest.Server.Controllers
     [Route("api/[controller]")]
     public class EmployeesController : ControllerBase
     {
+        private readonly IEmployeeRepo _repo;
+
+        public EmployeesController(IEmployeeRepo repo) 
+        { 
+            _repo = repo;
+        }
+
         [HttpGet]
         public List<Employee> Get()
         {
-            return GetAllEmployees();
+            return _repo.GetAllEmployees();
         }
 
         [HttpGet("{id}")]
         public Employee Get(int id)
         {
-            return GetEmployee(id);
+            return _repo.GetEmployee(id);
         }
 
         [HttpPost("add")]
         public bool Add(Employee employee)
         {
-            return AddEmployee(employee);
+            return _repo.AddEmployee(employee);
         }
 
         [HttpPut("update")] 
         public bool Update(Employee employee)
         {
-            return UpdateEmployee(employee);
+            return _repo.UpdateEmployee(employee);
         }
 
         [HttpDelete("{id}")]
         public bool Delete(int id)
         {
-            return DeleteEmployee(id);
+            return _repo.DeleteEmployee(id);
         }
 
         [HttpGet("increase")]
         public void Increase()
         {
-            BulkValueIncrement();
+            _repo.BulkValueIncrement();
         }
     }
 }

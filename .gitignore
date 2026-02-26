@@ -2,3 +2,9 @@
 /.vscode
 /InterviewTest.Server.TestProject/bin/Debug/net10.0
 /InterviewTest.Server.TestProject/obj
+/InterviewTest.Interfaces/bin/Debug/net8.0
+/InterviewTest.Interfaces/obj
+/InterviewTest.Model/bin/Debug/net8.0
+/InterviewTest.Model/obj
+/InterviewTest.Repo/bin/Debug/net8.0
+/InterviewTest.Repo/obj

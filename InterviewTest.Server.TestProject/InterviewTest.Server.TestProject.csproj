@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InterviewTest.Repo\InterviewTest.Repo.csproj" />
     <ProjectReference Include="..\InterviewTest.Server\InterviewTest.Server.csproj" />
   </ItemGroup>
 

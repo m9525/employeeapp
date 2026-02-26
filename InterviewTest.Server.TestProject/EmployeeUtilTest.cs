@@ -1,5 +1,5 @@
-﻿using InterviewTest.Server.Model;
-using InterviewTest.Server.Util;
+﻿using InterviewTest.Repo;
+using InterviewTest.Server.Model;
 
 namespace InterviewTest.Server.TestProject
 {
@@ -9,7 +9,8 @@ namespace InterviewTest.Server.TestProject
         [TestMethod]
         public void Given_No_Filter_Return_all_Employees()
         {
-            var actual = EmployeeUtil.GetAllEmployees();
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
+            var actual = repo.GetAllEmployees();
             Assert.IsNotNull(actual);
             Assert.IsTrue(actual.Count > 0);
 
@@ -20,8 +21,9 @@ namespace InterviewTest.Server.TestProject
         [TestMethod]
         public void Given_Employee_Id_Exists_Return_Employee()
         {
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
             int id = 64; // Stephen's Id
-            var actual = EmployeeUtil.GetEmployee(id);
+            var actual = repo.GetEmployee(id);
             Assert.IsNotNull(actual);
             Assert.AreEqual(id, actual.Id);
             Assert.AreEqual("Stephen", actual.Name);
@@ -30,32 +32,34 @@ namespace InterviewTest.Server.TestProject
         [TestMethod]
         public void Given_Employee_Id_Exists_Delete_Employee()
         {
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
             int id = 72; // Yuri's ID            
             // now you see            
-            var employee72 = EmployeeUtil.GetEmployee(id);            
+            var employee72 = repo.GetEmployee(id);            
 
             // now you don't
-            bool deleted = EmployeeUtil.DeleteEmployee(id);
+            bool deleted = repo.DeleteEmployee(id);
             Assert.IsTrue(deleted);
-            var allEmployees = EmployeeUtil.GetAllEmployees();
+            var allEmployees = repo.GetAllEmployees();
             Assert.IsFalse(allEmployees.Any(e => e.Id == id));
 
-            var ghostEmployee72 = EmployeeUtil.GetEmployee(id);
+            var ghostEmployee72 = repo.GetEmployee(id);
             Assert.IsNull(ghostEmployee72);
 
             // TODO: add the employee back for other tests
-            Assert.IsTrue(EmployeeUtil.AddEmployee(employee72));
-            allEmployees = EmployeeUtil.GetAllEmployees();
-            Assert.IsFalse(allEmployees.Any(e => e.Name.Equals(employee72.Name))); // ID will change, but name should be the same
+            Assert.IsTrue(repo.AddEmployee(employee72));
+            allEmployees = repo.GetAllEmployees();
+            Assert.IsTrue(allEmployees.Any(e => e.Name.Equals(employee72.Name))); // ID will change, but name should be the same
         }
 
         [TestMethod]
         public void Given_Employee_Exist_UpdateEmployee()
         {
-            var allEmployees = EmployeeUtil.GetAllEmployees();            
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
+            var allEmployees = repo.GetAllEmployees();            
             var anyId = new Random().Next(allEmployees.Count);
 
-            var randomEmployee = EmployeeUtil.GetEmployee(anyId);
+            var randomEmployee = repo.GetEmployee(anyId);
             Assert.IsNotNull(randomEmployee);
             Assert.AreEqual(anyId, randomEmployee.Id);
 
@@ -68,10 +72,10 @@ namespace InterviewTest.Server.TestProject
 
             randomEmployee.Value = updatedValue;
 
-            bool updated = EmployeeUtil.UpdateEmployee(randomEmployee); // AddEmployee will update if ID exists
+            bool updated = repo.UpdateEmployee(randomEmployee); // AddEmployee will update if ID exists
             Assert.IsTrue(updated);
 
-            var updatedEmployee = EmployeeUtil.GetEmployee(anyId);
+            var updatedEmployee = repo.GetEmployee(anyId);
             Assert.IsNotNull(updatedEmployee);
             Assert.AreEqual(updatedName, updatedEmployee.Name);
             Assert.AreEqual(updatedValue, updatedEmployee.Value); 
@@ -81,7 +85,8 @@ namespace InterviewTest.Server.TestProject
         [TestMethod]
         public void Given_EmployeeE_Increase1_EmployeeG_Increase10_EmployeeOther_Increase100_When_Calling_Bulk_Increment()
         {
-            var employees = EmployeeUtil.GetAllEmployees();
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
+            var employees = repo.GetAllEmployees();
             Assert.IsNotNull(employees);
 
             // total at start
@@ -99,8 +104,8 @@ namespace InterviewTest.Server.TestProject
 
             Assert.IsLessThan(increasedSum, originalSum);
 
-            EmployeeUtil.BulkValueIncrement();
-            var updatedEmployees = EmployeeUtil.GetAllEmployees();
+            repo.BulkValueIncrement();
+            var updatedEmployees = repo.GetAllEmployees();
             int actualIncreasedSum = updatedEmployees.Select(e => e.Value).Sum();
             
             Assert.AreEqual(increasedSum, actualIncreasedSum);
@@ -109,7 +114,8 @@ namespace InterviewTest.Server.TestProject
         [TestMethod]
         public void Given_All_Employees_Sum_NameStartsWithA_B_C()
         {
-            var employees = EmployeeUtil.GetAllEmployees();
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
+            var employees = repo.GetAllEmployees();
             Assert.IsNotNull(employees);
             int abcSum = employees.Select(e =>
             {
@@ -121,9 +127,10 @@ namespace InterviewTest.Server.TestProject
         [TestMethod]
         public void Given_New_Employee_Then_Add_Successfully()
         {
+            SqlLiteEmployeeRepo repo = new SqlLiteEmployeeRepo(); repo.PrepareRepo(); // ensure the repo is ready before testing
             var emp = new Employee(0, "Hello", 999);
-            Assert.IsTrue(EmployeeUtil.AddEmployee(emp));
-                var allEmployees = EmployeeUtil.GetAllEmployees();
+            Assert.IsTrue(repo.AddEmployee(emp));
+                var allEmployees = repo.GetAllEmployees();
             Assert.IsNotNull(allEmployees);
             Assert.IsTrue(allEmployees.Any(e => e.Name == emp.Name && e.Value == emp.Value));
         }
